@@ -10,10 +10,10 @@ router = Router()
 
 
 @router.message(Command(commands=["start"]))
-async def msg_start(msg: Message, state: FSMContext):
+async def first_start(msg: Message, state: FSMContext):
     curr_state = await state.get_state()
     if curr_state is not None:
-        return
+        return home(call=msg, state=state)
     await state.set_state(MainStream.Start)
     await editor(entity=msg)
     photo = FSInputFile(get_path(name="start.webp"))
@@ -26,8 +26,12 @@ async def msg_start(msg: Message, state: FSMContext):
     await state.update_data(bot_msg=bot_msg, start_photo=InputMediaPhoto(media=photo))
 
 
-@router.callback_query(F.data == "start", MainStream.Start)
-async def call_start(call: CallbackQuery, state: FSMContext):
+@router.callback_query(F.data == "home")
+async def home(call: CallbackQuery | Message, state: FSMContext):
+    curr_state = await state.get_state()
+    if curr_state != "MainStream:Start":
+        await state.set_state(MainStream.Start)
+
     state_data = await state.get_data()
     await editor(
         entity=call,

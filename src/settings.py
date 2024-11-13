@@ -9,4 +9,4 @@ if not find_dotenv(ENV_FILE):
 load_dotenv()
 
 BOT_TOKEN = getenv("BOT_TOKEN")
-DEBUG = bool(getenv("DEBUG"))
+NOTIFICATION_TIME = getenv("NOTIFICATION_TIME")

@@ -3,7 +3,7 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 reg_markup = InlineKeyboardMarkup(
     inline_keyboard=[
         [
-            InlineKeyboardButton(text="Зарегистрироваться 📝", callback_data="start")
+            InlineKeyboardButton(text="Зарегистрироваться 📝", callback_data="home")
         ]
     ]
 )
@@ -11,10 +11,10 @@ reg_markup = InlineKeyboardMarkup(
 start_markup = InlineKeyboardMarkup(
     inline_keyboard=[
         [
-            InlineKeyboardButton(text="First 📝", callback_data="first")
+            InlineKeyboardButton(text="Список привычек 📑", callback_data="habits_list")
         ],
         [
-            InlineKeyboardButton(text="Second 📝", callback_data="second")
+            InlineKeyboardButton(text="Добавить привычку ✏", callback_data="habits_create")
         ]
     ]
 )

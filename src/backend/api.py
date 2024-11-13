@@ -1,13 +1,12 @@
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
-from src.settings import DEBUG
 
-app = FastAPI(debug=DEBUG)
+app = FastAPI()
 
 
-@app.get("/")
-async def index():
+@app.get("/get_user_habits/")
+async def get_user_habits(user_id: int, limit: int):
     return JSONResponse(
-        content={"data": "Index html"},
+        content={"message": f"User({user_id}) Habits({limit=}): []"},
         status_code=200,
     )
