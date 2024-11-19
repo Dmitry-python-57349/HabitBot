@@ -1,5 +1,6 @@
 import os
 import asyncio
+from sys import executable as python
 from subprocess import Popen
 from src.frontend.bot import bot, dp, BOT_COMMANDS
 
@@ -15,10 +16,10 @@ async def change_dir(app: str = ""):
 
 
 async def main():
-    await change_dir("notification")
-    notification_proc: Popen = Popen(["python", "notification.py"])
+    # await change_dir("notification")
+    # notification_proc: Popen = Popen([python, "notification.py"])
     await change_dir("backend")
-    api_proc: Popen = Popen(["uvicorn", "api:app"])
+    api_proc: Popen = Popen([python, "-m", "uvicorn", "api:app"])
     await change_dir()
 
     await bot.set_my_commands(commands=BOT_COMMANDS)
@@ -26,7 +27,7 @@ async def main():
     try:
         await dp.start_polling(bot)
     except KeyboardInterrupt:
-        notification_proc.terminate()
+        # notification_proc.terminate()
         api_proc.terminate()
 
 

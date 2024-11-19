@@ -4,7 +4,7 @@ from aiogram.types import BotCommand
 from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 from aiogram.fsm.storage.memory import MemoryStorage
-from src.settings import BOT_TOKEN
+from src.settings import settings
 
 BOT_COMMANDS = [
         BotCommand(command=command[0], description=command[1])
@@ -12,12 +12,11 @@ BOT_COMMANDS = [
     ]
 
 if __name__ != "__main__":
-    bot = Bot(BOT_TOKEN, default=DefaultBotProperties(parse_mode="HTML"))
+    bot = Bot(settings.BOT_TOKEN, default=DefaultBotProperties(parse_mode="HTML"))
     storage = MemoryStorage()
     dp = Dispatcher(storage=storage)
     dp.include_routers(
         routers.start_router,
         routers.habits_router,
+        routers.habit_view,
     )
-else:
-    exit("Subfile loader.py!")

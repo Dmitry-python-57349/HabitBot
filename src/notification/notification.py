@@ -1,14 +1,16 @@
 import schedule
 from time import sleep
-from src.settings import NOTIFICATION_TIME
+from src.settings import settings
 
 
 def main():
-    print("Hello!")
+    print("Hello! every 5 secs.")
 
 
 if __name__ == "__main__":
-    schedule.every().day.at(NOTIFICATION_TIME).do(main)
+    print(settings.NOTIFICATION_TIME)
+    schedule.every(5).seconds.do(main)
+    # schedule.every().day.at(time_str=settings.NOTIFICATION_TIME).do(main)
     try:
         while True:
             schedule.run_pending()
