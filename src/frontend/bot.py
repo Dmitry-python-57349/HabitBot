@@ -19,4 +19,5 @@ if __name__ != "__main__":
         routers.start_router,
         routers.habits_router,
         routers.habit_view,
+        routers.habit_create,
     )

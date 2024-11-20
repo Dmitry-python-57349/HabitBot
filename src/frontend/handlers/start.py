@@ -2,7 +2,10 @@ from aiogram import Router, F
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, FSInputFile, InputMediaPhoto, CallbackQuery
-from src.frontend.utils import edit_delete_bot_msg as editor, get_success_image_path as get_path
+from src.frontend.utils import (
+    edit_delete_bot_msg as editor,
+    get_success_image_path as get_path,
+)
 from src.frontend.states import MainStream
 from src.frontend.keyboards.inline_keyboards import reg_markup as reg, start_markup
 
@@ -12,7 +15,7 @@ router = Router()
 @router.message(Command(commands=["start"]))
 async def first_start(msg: Message, state: FSMContext):
     curr_state = await state.get_state()
-    await editor(entity=msg)
+    await editor(msg=msg)
 
     if curr_state is not None:
         return await home(state=state)
@@ -29,6 +32,9 @@ async def first_start(msg: Message, state: FSMContext):
     await state.update_data(
         bot_msg=bot_msg,
         start_photo=InputMediaPhoto(media=photo),
+        curr_habit=0,
+        habit_name="",
+        habit_desc="",
     )
 
 
@@ -41,8 +47,7 @@ async def home(call: CallbackQuery | None = None, state: FSMContext | None = Non
 
     state_data = await state.get_data()
     await editor(
-        entity=state_data["bot_msg"],
+        msg=state_data["bot_msg"],
         caption="⭐ Главное меню ⭐",
-        picture=state_data["start_photo"],
         markup=start_markup,
     )

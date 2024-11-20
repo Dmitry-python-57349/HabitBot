@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 from sql_core import AsyncORM
-
+from pydantic_models import UserHabitData
 
 app = FastAPI()
 
@@ -21,9 +21,9 @@ async def get_habits(user_id: int):
     return {"data": habits}
 
 
-@app.get("/add_habit/")
-async def add_habit(user_id: int):
-    await AsyncORM.add_habit(user_id=user_id)
+@app.post("/add_habit/")
+async def add_habit(data: UserHabitData):
+    await AsyncORM.add_habit(data=data)
     return JSONResponse(
         content={"message": f"Habit created!"},
         status_code=201,
@@ -45,14 +45,4 @@ async def delete_habit(user_id: int):
     return JSONResponse(
         content={"message": f"Habit deleter!"},
         status_code=204,
-    )
-
-
-@app.get("/db/")
-async def get_user_habits():
-    await AsyncORM.create_tables()
-    await add_user(user_id=5341671335, firstname="aa", lastname="gg", username="ffff")
-    return JSONResponse(
-        content={"message": "DB!"},
-        status_code=201,
     )

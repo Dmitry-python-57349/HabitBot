@@ -1,25 +1,25 @@
 import os.path
-from aiogram.types import Message, InputMediaPhoto, CallbackQuery, InlineKeyboardMarkup
+from aiogram.types import Message, InputMediaPhoto, InlineKeyboardMarkup
 
 ABS_PATH = os.path.abspath("")
 
 
 async def edit_delete_bot_msg(
-        entity: Message | CallbackQuery,
+        msg: Message,
         caption: str | None = None,
         picture: InputMediaPhoto | None = None,
         markup: InlineKeyboardMarkup | None = None
 ) -> None:
 
-    if isinstance(entity, Message):
-        chat_id = entity.chat.id
-        message_id = entity.message_id
+    if isinstance(msg, Message):
+        chat_id = msg.chat.id
+        message_id = msg.message_id
+        bot = msg.bot
     else:
-        chat_id = entity.message.chat.id
-        message_id = entity.message.message_id
+        raise Exception("bot_msg not Message instance!")
 
     if picture:
-        await entity.bot.edit_message_media(
+        await bot.edit_message_media(
             media=picture,
             chat_id=chat_id,
             message_id=message_id,
@@ -27,21 +27,21 @@ async def edit_delete_bot_msg(
 
     if caption:
         if markup:
-            await entity.bot.edit_message_caption(
+            await bot.edit_message_caption(
                 caption=caption,
                 chat_id=chat_id,
                 message_id=message_id,
                 reply_markup=markup,
             )
             return
-        await entity.bot.edit_message_caption(
+        await bot.edit_message_caption(
             caption=caption,
             chat_id=chat_id,
             message_id=message_id,
         )
         return
 
-    await entity.bot.delete_message(
+    await bot.delete_message(
         chat_id=chat_id,
         message_id=message_id,
     )

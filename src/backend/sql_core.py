@@ -1,8 +1,7 @@
 from sqlalchemy import select
-
 from db_engine import Base, async_engine, async_session
 from models import User, Habit
-from random import shuffle
+from pydantic_models import UserHabitData
 
 
 class AsyncORM:
@@ -48,17 +47,13 @@ class AsyncORM:
 
     @staticmethod
     async def add_habit(
-            user_id: int,
+            data: UserHabitData,
     ) -> None:
         async with async_session() as session:
-            names = ["ggg", "adadad", "dada", "daadad"]
-            descs = ["afaffff", "aa", "fafaaf", "qqq"]
-            shuffle(names)
-            shuffle(descs)
             habit = Habit(
-                name=names[-1],
-                description=descs[-1],
-                user_id=user_id,
+                name=data.name,
+                description=data.description,
+                user_id=data.user_id,
             )
             session.add(habit)
             await session.commit()
