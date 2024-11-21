@@ -5,6 +5,7 @@ from aiogram.types import Message, FSInputFile, InputMediaPhoto, CallbackQuery
 from src.frontend.utils import (
     edit_delete_bot_msg as editor,
     get_success_image_path as get_path,
+    reg_user,
 )
 from src.frontend.states import MainStream
 from src.frontend.keyboards.inline_keyboards import reg_markup as reg, start_markup
@@ -36,6 +37,7 @@ async def first_start(msg: Message, state: FSMContext):
         habit_name="",
         habit_desc="",
     )
+    await reg_user(user=msg.from_user)
 
 
 @router.callback_query(F.data == "home")

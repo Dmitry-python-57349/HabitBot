@@ -6,20 +6,13 @@ from sqlalchemy.orm import Mapped, mapped_column
 from db_engine import Base
 
 
-def on_update_func():
-    timezone_offset = 3.0  # Pacific Standard Time (UTC−08:00)
-    timezone_info = timezone(timedelta(hours=timezone_offset))
-    return datetime.now(timezone_info)
-
-
 bigint = Annotated[int, mapped_column(BIGINT)]
-created_at = Annotated[datetime, mapped_column(
-    server_default=text("TIMEZONE('Europe/Moscow', now())"),
-)]
-updated_at = Annotated[datetime, mapped_column(
+created_at = Annotated[
+    datetime,
+    mapped_column(
         server_default=text("TIMEZONE('Europe/Moscow', now())"),
-        onupdate=on_update_func,
-    )]
+    ),
+]
 
 
 class User(Base):
@@ -46,10 +39,7 @@ class Habit(Base):
     name: Mapped[str]
     description: Mapped[str]
     created_at: Mapped[created_at]
-    updated_at: Mapped[updated_at]
-    user_id: Mapped[bigint] = mapped_column(
-        ForeignKey("users.id", ondelete="CASCADE")
-    )
+    user_id: Mapped[bigint] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
 
     def __repr__(self):
         return f"<{self.__class__.__name__}: {self.id}> {self.name}"

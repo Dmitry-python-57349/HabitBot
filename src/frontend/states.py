@@ -7,5 +7,6 @@ class MainStream(StatesGroup):
     Habit_create_name = State()
     Habit_create_desc = State()
     Habit_read = State()
-    Habit_update = State()
+    Habit_edit_name = State()
+    Habit_edit_desc = State()
     Habit_delete = State()

@@ -1,18 +1,14 @@
-from fastapi import FastAPI
-from fastapi.responses import JSONResponse
+from fastapi import FastAPI, Body
 from sql_core import AsyncORM
-from pydantic_models import UserHabitData
+from pydantic_models import UserHabitData, UserData
 
 app = FastAPI()
 
 
-@app.get("/add_user/")
-async def add_user(user_id: int, **kwargs):
-    await AsyncORM.add_user(user_id=user_id, **kwargs)
-    return JSONResponse(
-        content={"message": f"User({user_id}) created!"},
-        status_code=201,
-    )
+@app.post("/add_user/")
+async def add_user(user: UserData):
+    user_id = await AsyncORM.add_user(user=user)
+    return {"message": f"<User: {user_id}> created!"}
 
 
 @app.get("/get_habits/")
@@ -23,26 +19,23 @@ async def get_habits(user_id: int):
 
 @app.post("/add_habit/")
 async def add_habit(data: UserHabitData):
-    await AsyncORM.add_habit(data=data)
-    return JSONResponse(
-        content={"message": f"Habit created!"},
-        status_code=201,
-    )
+    habit_id = await AsyncORM.add_habit(data=data)
+    return {"message": f"<Habit: {habit_id}> has been created!"}
 
 
-@app.get("/edit_habit/")
-async def edit_habit(user_id: int):
-    # await AsyncORM.add_habit(user_id=user_id)
-    return JSONResponse(
-        content={"message": f"Habit editor!"},
-        status_code=201,
-    )
+@app.put("/edit_habit/")
+async def edit_habit(data=Body()):
+    await AsyncORM.edit_habit(**data)
+    return {"message": f"Habit edited!"}
 
 
-@app.get("/delete_habit/")
-async def delete_habit(user_id: int):
-    # await AsyncORM.add_habit(user_id=user_id)
-    return JSONResponse(
-        content={"message": f"Habit deleter!"},
-        status_code=204,
-    )
+@app.delete("/delete_habit/")
+async def delete_habit(data=Body()):
+    await AsyncORM.delete_habit(habit_id=data["habit_id"])
+    return {"message": "Habit has been deleted!"}
+
+
+@app.get("/db/")
+async def db():
+    await AsyncORM.create_tables()
+    return "Good!"

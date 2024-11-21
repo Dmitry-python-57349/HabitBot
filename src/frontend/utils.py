@@ -1,14 +1,17 @@
 import os.path
+from aiohttp import ClientSession
+from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, InputMediaPhoto, InlineKeyboardMarkup
+from aiogram.types.user import User as TgUser
 
 ABS_PATH = os.path.abspath("")
 
 
 async def edit_delete_bot_msg(
-        msg: Message,
-        caption: str | None = None,
-        picture: InputMediaPhoto | None = None,
-        markup: InlineKeyboardMarkup | None = None
+    msg: Message,
+    caption: str | None = None,
+    picture: InputMediaPhoto | None = None,
+    markup: InlineKeyboardMarkup | None = None,
 ) -> None:
 
     if isinstance(msg, Message):
@@ -45,6 +48,44 @@ async def edit_delete_bot_msg(
         chat_id=chat_id,
         message_id=message_id,
     )
+
+
+async def delete_fixer(state: FSMContext) -> None:
+    state_ = await state.get_state()
+    state_data = await state.get_data()
+    num_of_habits, curr_habit = state_data["num_of_habits"], state_data["curr_habit"]
+    list_num = num_of_habits - 1
+    if state_ == "MainStream:Habit_delete":
+        if 0 < curr_habit < list_num:
+            return
+        if curr_habit > list_num:
+            await state.update_data(curr_habit=list_num)
+
+
+async def edit_habit(state: FSMContext, **kwargs) -> None:
+    state_data = await state.get_data()
+    habits_data, curr_habit = state_data["habits_data"], state_data["curr_habit"]
+    json_data = {"habit_id": habits_data[curr_habit]["id"]}
+    json_data.update(**kwargs)
+    async with ClientSession() as session:
+        await session.put(
+            "http://127.0.0.1:8000/edit_habit/",
+            json=json_data,
+        )
+
+
+async def reg_user(user: TgUser) -> None:
+    user_data = {
+        "user_id": user.id,
+        "username": user.username,
+        "firstname": user.first_name,
+        "lastname": user.last_name,
+    }
+    async with ClientSession() as session:
+        await session.post(
+            "http://127.0.0.1:8000/add_user/",
+            json=user_data,
+        )
 
 
 def get_success_image_path(name: str) -> str:

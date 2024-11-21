@@ -3,7 +3,10 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
 from src.frontend.utils import edit_delete_bot_msg as editor
 from src.frontend.states import MainStream
-from src.frontend.keyboards.inline_keyboards import habit_markup_builder
+from src.frontend.keyboards.inline_keyboards import (
+    habit_markup_builder,
+    habit_index_error_markup as habit_error_m,
+)
 
 router = Router()
 HABIT_CAPTION = """
@@ -13,12 +16,20 @@ HABIT_CAPTION = """
 
 Описание: {description}
 """
+HABIT_INDEX_ERROR = """
+На данный момент у вас не добавлено ни одной привычки.
+
+Нажми на кнопку "добавить привычку" чтобы исправить это 👇
+"""
 
 
 @router.callback_query(F.data.in_(["next", "prev"]), MainStream.Habit_read)
 async def next_prev(call: CallbackQuery | None = None, state: FSMContext | None = None):
     state_data = await state.get_data()
     curr_habit, num_of_habits = state_data["curr_habit"], state_data["num_of_habits"]
+    if num_of_habits == 1:
+        await call.answer(text="У тебя одна привычка, куда листаешь?)")
+        return
     list_num_of_habits = num_of_habits - 1
     match call.data:
         case "next":
@@ -56,12 +67,23 @@ async def habit_viewer(
         curr_habit=curr_habit + 1,
         num_of_habits=num_of_habits,
     )
+    try:
+        name = habits_data[curr_habit]["name"]
+        description = habits_data[curr_habit]["description"]
+    except IndexError:
+        await editor(
+            msg=state_data["bot_msg"],
+            caption=HABIT_INDEX_ERROR,
+            markup=habit_error_m,
+        )
+        await state.set_state(MainStream.Start)
+        return
     await editor(
         msg=state_data["bot_msg"],
         caption=HABIT_CAPTION.format(
             curr_habit=curr_habit + 1,
-            name=habits_data[curr_habit]["name"],
-            description=habits_data[curr_habit]["description"],
+            name=name,
+            description=description,
         ),
         markup=habit_markup,
     )

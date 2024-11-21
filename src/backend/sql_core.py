@@ -1,7 +1,7 @@
-from sqlalchemy import select
+from sqlalchemy import select, delete, update, insert
 from db_engine import Base, async_engine, async_session
 from models import User, Habit
-from pydantic_models import UserHabitData
+from pydantic_models import UserHabitData, UserData
 
 
 class AsyncORM:
@@ -12,43 +12,44 @@ class AsyncORM:
             await conn.run_sync(Base.metadata.create_all)
 
     @staticmethod
-    async def add_user(
-        user_id: int,
-        username: str,
-        firstname: str,
-        lastname: str,
-    ) -> None:
+    async def add_user(user: UserData) -> int:
         async with async_session() as session:
             user = User(
-                id=user_id,
-                username=username,
-                firstname=firstname,
-                lastname=lastname,
+                id=user.user_id,
+                username=user.username,
+                firstname=user.firstname,
+                lastname=user.lastname,
             )
             session.add(user)
+            await session.flush()
+            await session.refresh(user)
+            user_id = user.id
             await session.commit()
+            return user_id
 
     @staticmethod
     async def get_habits(user_id: int) -> list[Habit]:
         async with async_session() as session:
-            query = select(Habit).filter(Habit.user_id == user_id)
-            res = await session.execute(query)
+            stmt = select(Habit).filter(Habit.user_id == user_id)
+            res = await session.execute(stmt)
             return res.scalars().all()
 
     @staticmethod
-    async def edit_habit(user_tg_id: int, habit_id: int):
+    async def edit_habit(habit_id: int, **kwargs) -> None:
         async with async_session() as session:
-            ...
+            stmt = update(Habit).where(Habit.id == habit_id).values(**kwargs)
+            await session.execute(stmt)
+            await session.commit()
 
     @staticmethod
-    async def delete_habit(user_tg_id: int, habit_id: int):
+    async def delete_habit(habit_id: int) -> None:
         async with async_session() as session:
-            ...
+            stmt = delete(Habit).where(Habit.id == habit_id)
+            await session.execute(stmt)
+            await session.commit()
 
     @staticmethod
-    async def add_habit(
-            data: UserHabitData,
-    ) -> None:
+    async def add_habit(data: UserHabitData) -> int:
         async with async_session() as session:
             habit = Habit(
                 name=data.name,
@@ -56,4 +57,8 @@ class AsyncORM:
                 user_id=data.user_id,
             )
             session.add(habit)
+            await session.flush()
+            await session.refresh(habit)
+            habit_id = habit.id
             await session.commit()
+            return habit_id

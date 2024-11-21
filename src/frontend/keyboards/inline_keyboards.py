@@ -39,6 +39,19 @@ create_habit_markup = InlineKeyboardMarkup(
     ]
 )
 
+habit_index_error_markup = InlineKeyboardMarkup(
+    inline_keyboard=[
+        [
+            InlineKeyboardButton(
+                text="Добавить привычку ✏", callback_data="habits_create"
+            ),
+        ],
+        [
+            InlineKeyboardButton(text="Главное меню 🏡", callback_data="home"),
+        ],
+    ]
+)
+
 
 async def habit_markup_builder(
     curr_habit: int | str,
@@ -46,8 +59,8 @@ async def habit_markup_builder(
 ) -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
     builder.add(
-        InlineKeyboardButton(text="Изменить название", callback_data="habit_edit"),
-        InlineKeyboardButton(text="Изменить описание", callback_data="habit_edit"),
+        InlineKeyboardButton(text="Изменить название", callback_data="habit_edit_name"),
+        InlineKeyboardButton(text="Изменить описание", callback_data="habit_edit_desc"),
         InlineKeyboardButton(text="Удалить 🗑", callback_data="habit_delete"),
         InlineKeyboardButton(text="←", callback_data="prev"),
         InlineKeyboardButton(
