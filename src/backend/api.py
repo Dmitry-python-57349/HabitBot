@@ -1,8 +1,9 @@
 from fastapi import FastAPI, Body
 from sql_core import AsyncORM
 from pydantic_models import UserHabitData, UserData
+from src.notification.notification import lifespan
 
-app = FastAPI()
+app = FastAPI(lifespan=lifespan)
 
 
 @app.post("/add_user/")

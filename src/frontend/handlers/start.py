@@ -53,3 +53,9 @@ async def home(call: CallbackQuery | None = None, state: FSMContext | None = Non
         caption="⭐ Главное меню ⭐",
         markup=start_markup,
     )
+
+
+@router.callback_query(F.data == "clean")
+async def clean(call: CallbackQuery, state: FSMContext):
+    await editor(call.message)
+    await call.answer(text="Очищено!")

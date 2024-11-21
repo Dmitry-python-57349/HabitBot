@@ -1,4 +1,4 @@
-from sqlalchemy import select, delete, update, insert
+from sqlalchemy import select, delete, update
 from db_engine import Base, async_engine, async_session
 from models import User, Habit
 from pydantic_models import UserHabitData, UserData
@@ -10,6 +10,13 @@ class AsyncORM:
         async with async_engine.begin() as conn:
             await conn.run_sync(Base.metadata.drop_all)
             await conn.run_sync(Base.metadata.create_all)
+
+    @staticmethod
+    async def user_ids() -> list[int]:
+        async with async_session() as session:
+            stmt = select(User.id)
+            result = await session.execute(stmt)
+            return result.scalars().all()
 
     @staticmethod
     async def add_user(user: UserData) -> int:

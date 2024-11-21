@@ -53,6 +53,11 @@ habit_index_error_markup = InlineKeyboardMarkup(
 )
 
 
+cleaning = InlineKeyboardMarkup(
+    inline_keyboard=[[InlineKeyboardButton(text="Удалить 🗑", callback_data="clean")]]
+)
+
+
 async def habit_markup_builder(
     curr_habit: int | str,
     num_of_habits: int | str,

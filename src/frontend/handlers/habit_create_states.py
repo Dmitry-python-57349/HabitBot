@@ -63,11 +63,13 @@ async def msg_handler(message: Message, state: FSMContext):
         case "create", "desc":
             await state.update_data(habit_desc=message.text)
         case "edit", "name":
+            await editor(msg=message)
             await edit_habit(state=state, name=message.text)
             await state.set_state(MainStream.Start)
             await habits_list(call=message, state=state)
             return
         case "edit", "desc":
+            await editor(msg=message)
             await edit_habit(state=state, description=message.text)
             await state.set_state(MainStream.Start)
             await habits_list(call=message, state=state)

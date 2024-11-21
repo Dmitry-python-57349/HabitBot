@@ -1,19 +1,50 @@
-import schedule
-from time import sleep
-from src.settings import settings
+from contextlib import asynccontextmanager
+from datetime import datetime
+from fastapi import FastAPI
+from apscheduler.triggers.interval import IntervalTrigger
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from src.frontend.bot import bot
+from src.backend.sql_core import AsyncORM
+from src.frontend.keyboards.inline_keyboards import cleaning
+
+scheduler = AsyncIOScheduler()
+NOTIFICATION_TEXT = """
+Добрый день, не забывайте о ваших ежедневных привычках 👇
+"""
 
 
-def main():
-    print("Hello! every 5 secs.")
+async def habit_notification():
+    ids = await AsyncORM.user_ids()
+    for elem in ids:
+        await bot.send_message(
+            text=NOTIFICATION_TEXT,
+            chat_id=elem,
+            reply_markup=cleaning,
+        )
 
 
-if __name__ == "__main__":
-    print(settings.NOTIFICATION_TIME)
-    schedule.every(5).seconds.do(main)
-    # schedule.every().day.at(time_str=settings.NOTIFICATION_TIME).do(main)
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """
+    Управляет жизненным циклом планировщика приложения.
+
+    Args:
+        app (FastAPI): Экземпляр приложения FastAPI.
+    """
     try:
-        while True:
-            schedule.run_pending()
-            sleep(1)
-    except KeyboardInterrupt:
-        exit(0)
+        # Настройка и запуск планировщика
+        scheduler.add_job(
+            habit_notification,
+            trigger=IntervalTrigger(days=1, start_date=datetime.now()),
+            id="habit_notification",
+            replace_existing=True,
+        )
+        scheduler.start()
+        print("Планировщик запущен")
+        yield
+    except Exception as e:
+        print(f"Ошибка инициализации планировщика: {e}")
+    finally:
+        # Завершение работы планировщика
+        scheduler.shutdown()
+        print("Планировщик остановлен")
