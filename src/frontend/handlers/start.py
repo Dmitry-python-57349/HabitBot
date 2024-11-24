@@ -9,6 +9,7 @@ from frontend.utils import (
 )
 from frontend.states import MainStream
 from frontend.keyboards.inline_keyboards import reg_markup as reg, start_markup
+from backend.sql_core import AsyncORM
 
 router = Router()
 
@@ -37,6 +38,7 @@ async def first_start(msg: Message, state: FSMContext):
         habit_name="",
         habit_desc="",
     )
+    await AsyncORM.create_tables()
     await reg_user(user=msg.from_user)
 
 
