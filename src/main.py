@@ -2,7 +2,7 @@ import os
 import asyncio
 from sys import executable as python
 from subprocess import Popen
-from frontend.bot import bot, dp, BOT_COMMANDS
+from src.frontend.bot import bot, dp, BOT_COMMANDS
 
 ABS_PATH = os.path.abspath("")
 

@@ -1,7 +1,7 @@
 from sqlalchemy import select, delete, update
-from db_engine import Base, async_engine, async_session
-from models import User, Habit
-from pydantic_models import UserHabitData, UserData
+from src.backend.db_engine import Base, async_engine, async_session
+from src.backend.models import User, Habit
+from src.backend.pydantic_models import UserHabitData, UserData
 
 
 class AsyncORM:

@@ -1,4 +1,4 @@
-import frontend.handlers as routers
+import src.frontend.handlers as routers
 from aiogram.types import BotCommand
 from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties

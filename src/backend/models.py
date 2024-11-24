@@ -1,9 +1,9 @@
-from datetime import datetime, timedelta, timezone
+from datetime import datetime
 from typing import Annotated
 
 from sqlalchemy import text, BIGINT, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column
-from db_engine import Base
+from src.backend.db_engine import Base
 
 
 bigint = Annotated[int, mapped_column(BIGINT)]
