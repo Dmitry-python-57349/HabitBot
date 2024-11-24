@@ -2,13 +2,13 @@ from aiogram import Router, F
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, FSInputFile, InputMediaPhoto, CallbackQuery
-from src.frontend.utils import (
+from frontend.utils import (
     edit_delete_bot_msg as editor,
     get_success_image_path as get_path,
     reg_user,
 )
-from src.frontend.states import MainStream
-from src.frontend.keyboards.inline_keyboards import reg_markup as reg, start_markup
+from frontend.states import MainStream
+from frontend.keyboards.inline_keyboards import reg_markup as reg, start_markup
 
 router = Router()
 

@@ -66,6 +66,7 @@ async def habit_markup_builder(
     builder.add(
         InlineKeyboardButton(text="Изменить название", callback_data="habit_edit_name"),
         InlineKeyboardButton(text="Изменить описание", callback_data="habit_edit_desc"),
+        InlineKeyboardButton(text="Отметить привычку ⭐", callback_data="habit_mark"),
         InlineKeyboardButton(text="Удалить 🗑", callback_data="habit_delete"),
         InlineKeyboardButton(text="←", callback_data="prev"),
         InlineKeyboardButton(
@@ -74,5 +75,5 @@ async def habit_markup_builder(
         InlineKeyboardButton(text="→", callback_data="next"),
         InlineKeyboardButton(text="Главное меню 🏡", callback_data="home"),
     )
-    builder.adjust(2, 1, 3, 1)
+    builder.adjust(2, 1, 1, 3, 1)
     return builder.as_markup()

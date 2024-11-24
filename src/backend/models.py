@@ -38,6 +38,8 @@ class Habit(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str]
     description: Mapped[str]
+    mark_counter: Mapped[int] = mapped_column(default=0)
+    today_mark: Mapped[bool] = mapped_column(default=False)
     created_at: Mapped[created_at]
     user_id: Mapped[bigint] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
 

@@ -5,7 +5,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message
 from src.frontend.states import MainStream
 from src.frontend.handlers.habits_view import habit_viewer
-from src.frontend.utils import edit_delete_bot_msg as editor, delete_fixer
+from src.frontend.utils import edit_delete_bot_msg as editor, delete_fixer, get_url
 from src.frontend.keyboards.inline_keyboards import create_habit_markup as chm
 
 router = Router()
@@ -29,9 +29,9 @@ async def habits_list(
     curr_state = await state.get_state()
     if curr_state != "MainStream:Habit_read":
         async with ClientSession() as session:
-            response = await session.get(
-                f"http://127.0.0.1:8000/get_habits/?user_id={call.from_user.id}"
-            )
+            params = {"user_id": call.from_user.id}
+            url = await get_url(url_path="get_habits", params=params)
+            response = await session.get(url=url)
             content = await response.content.read()
             data = json.loads(content)
             await state.update_data(
@@ -67,11 +67,11 @@ async def habits_delete(
     state_data = await state.get_data()
     habits_data, curr_habit = state_data["habits_data"], state_data["curr_habit"]
     async with ClientSession() as session:
+        url = await get_url(url_path="delete_habit")
+        json_data = {"habit_id": habits_data[curr_habit]["id"]}
         await session.delete(
-            "http://127.0.0.1:8000/delete_habit/",
-            json={
-                "habit_id": habits_data[curr_habit]["id"],
-            },
+            url=url,
+            json=json_data,
         )
     await call.answer(text="Привычка удалена!")
     await state.set_state(MainStream.Habit_delete)

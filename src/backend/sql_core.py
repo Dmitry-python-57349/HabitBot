@@ -69,3 +69,10 @@ class AsyncORM:
             habit_id = habit.id
             await session.commit()
             return habit_id
+
+    @staticmethod
+    async def update_marks_to_false() -> None:
+        async with async_session() as session:
+            stmt = update(Habit).values(today_mark=False)
+            await session.execute(stmt)
+            await session.commit()

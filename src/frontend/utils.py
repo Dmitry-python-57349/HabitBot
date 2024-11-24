@@ -3,6 +3,7 @@ from aiohttp import ClientSession
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, InputMediaPhoto, InlineKeyboardMarkup
 from aiogram.types.user import User as TgUser
+from src.settings import settings
 
 ABS_PATH = os.path.abspath("")
 
@@ -68,10 +69,20 @@ async def edit_habit(state: FSMContext, **kwargs) -> None:
     json_data = {"habit_id": habits_data[curr_habit]["id"]}
     json_data.update(**kwargs)
     async with ClientSession() as session:
+        url = await get_url(url_path="edit_habit")
         await session.put(
-            "http://127.0.0.1:8000/edit_habit/",
+            url=url,
             json=json_data,
         )
+
+
+async def get_url(url_path: str = "", params: dict | None = None) -> str:
+    result = f"{settings.PROTO}://{settings.HOST}:{settings.PORT}/"
+    if url_path:
+        result += f"{url_path}/"
+    if params:
+        result += "?" + "&".join([f"{k}={v}" for k, v in params.items()])
+    return result
 
 
 async def reg_user(user: TgUser) -> None:
@@ -82,10 +93,8 @@ async def reg_user(user: TgUser) -> None:
         "lastname": user.last_name,
     }
     async with ClientSession() as session:
-        await session.post(
-            "http://127.0.0.1:8000/add_user/",
-            json=user_data,
-        )
+        url = await get_url(url_path="add_user")
+        await session.post(url=url, json=user_data)
 
 
 def get_success_image_path(name: str) -> str:

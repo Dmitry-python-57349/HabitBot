@@ -13,6 +13,10 @@ NOTIFICATION_TEXT = """
 """
 
 
+async def update_mark():
+    await AsyncORM.update_marks_to_false()
+
+
 async def habit_notification():
     ids = await AsyncORM.user_ids()
     for elem in ids:
@@ -37,6 +41,12 @@ async def lifespan(app: FastAPI):
             habit_notification,
             trigger=IntervalTrigger(days=1, start_date=datetime.now()),
             id="habit_notification",
+            replace_existing=True,
+        )
+        scheduler.add_job(
+            update_mark,
+            trigger=IntervalTrigger(days=1, start_date=datetime.now()),
+            id="update_marks",
             replace_existing=True,
         )
         scheduler.start()

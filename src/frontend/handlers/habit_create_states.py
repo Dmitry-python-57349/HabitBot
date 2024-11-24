@@ -3,7 +3,7 @@ from aiohttp import ClientSession
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message
 from src.frontend.states import MainStream
-from src.frontend.utils import edit_delete_bot_msg as editor, edit_habit
+from src.frontend.utils import edit_delete_bot_msg as editor, edit_habit, get_url
 from src.frontend.handlers.habits_CRUD import habits_create, habits_list
 from src.frontend.filters import ListStateFilter
 
@@ -86,12 +86,13 @@ async def habits_save(call: CallbackQuery, state: FSMContext):
         await call.answer(text="Недостаточно данных для создания привычки!")
         return
     async with ClientSession() as session:
+        url = await get_url(url_path="add_habit")
         data = {
             "user_id": call.from_user.id,
             "name": name,
             "description": desc,
         }
-        await session.post("http://127.0.0.1:8000/add_habit/", json=data)
+        await session.post(url=url, json=data)
     await call.answer(text="Привычка создана!")
     await state.update_data(
         habit_name="",
