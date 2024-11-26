@@ -16,15 +16,18 @@ async def change_dir(app: str = ""):
 
 
 async def main():
-    await change_dir("backend")
-    api_proc: Popen = Popen([python, "-m", "uvicorn", "api:app"])
-    await change_dir()
-
-    await bot.set_my_commands(commands=BOT_COMMANDS)
-    await bot.delete_webhook(drop_pending_updates=True)
     try:
-        await dp.start_polling(bot)
-    except KeyboardInterrupt:
+        await change_dir("backend")
+        api_proc: Popen = Popen([python, "-m", "uvicorn", "api:app"])
+        await change_dir()
+
+        await bot.set_my_commands(commands=BOT_COMMANDS)
+        await bot.delete_webhook(drop_pending_updates=True)
+        try:
+            await dp.start_polling(bot)
+        except KeyboardInterrupt:
+            api_proc.terminate()
+    except Exception:
         api_proc.terminate()
 
 

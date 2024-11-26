@@ -1,9 +1,23 @@
 from fastapi import FastAPI, Body
+from fastapi.routing import APIRoute
 from sql_core import AsyncORM
 from pydantic_models import UserHabitData, UserData
 from src.notification.notification import lifespan
 
 app = FastAPI(lifespan=lifespan)
+
+
+@app.get("/")
+async def index():
+    result = dict()
+    for route in app.routes:
+        if not isinstance(route, APIRoute):
+            continue
+        result[route.path] = {
+            "name": route.name,
+            "methods": route.methods,
+        }
+    return {"API": result}
 
 
 @app.post("/add_user/")
