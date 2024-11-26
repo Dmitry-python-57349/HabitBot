@@ -1,7 +1,8 @@
 from fastapi import FastAPI, Body
 from fastapi.routing import APIRoute
-from sql_core import AsyncORM
-from pydantic_models import UserHabitData, UserData
+
+from src.backend.pydantic_models import UserHabitData, UserData
+from src.backend.sql_core import AsyncORM
 from src.notification.notification import lifespan
 
 app = FastAPI(lifespan=lifespan)

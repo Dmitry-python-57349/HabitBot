@@ -5,7 +5,7 @@ from aiogram.types import Message, InputMediaPhoto, InlineKeyboardMarkup
 from aiogram.types.user import User as TgUser
 from src.settings import settings
 
-ABS_PATH = os.path.abspath("")
+ABS_PATH = os.path.abspath("src")
 
 
 async def edit_delete_bot_msg(

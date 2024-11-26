@@ -10,19 +10,22 @@ load_dotenv()
 
 
 class Settings:
-    BOT_TOKEN = getenv("BOT_TOKEN")
-    DB_HOST = getenv("DB_HOST")
-    DB_PORT = getenv("DB_PORT")
-    DB_USER = getenv("DB_USER")
-    DB_PASS = getenv("DB_PASS")
-    DB_NAME = getenv("DB_NAME")
-    HOST = getenv("HOST")
-    PORT = getenv("PORT")
-    PROTO = getenv("PROTO")
-    MAX_MARK_COUNT = getenv("MAX_MARK_COUNT")
+    try:
+        BOT_TOKEN = getenv("BOT_TOKEN")
+        DB_HOST = getenv("DB_HOST")
+        DB_PORT = getenv("DB_PORT")
+        DB_USER = getenv("DB_USER")
+        DB_PASS = getenv("DB_PASS")
+        DB_NAME = getenv("DB_NAME")
+        HOST = getenv("HOST")
+        PORT = getenv("PORT")
+        PROTO = getenv("PROTO")
+        MAX_MARK_COUNT = getenv("MAX_MARK_COUNT")
+    except ValueError:
+        exit("Ошибка получения целого числа!")
 
     @property
-    def get_db_url(self):
+    def get_db_url(self) -> str:
         return f"postgresql+asyncpg://{self.DB_USER}:{self.DB_PASS}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
 
 

@@ -2,14 +2,14 @@ from aiogram import Router, F
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, FSInputFile, InputMediaPhoto, CallbackQuery
-from frontend.utils import (
+from src.frontend.utils import (
     edit_delete_bot_msg as editor,
     get_success_image_path as get_path,
     reg_user,
 )
-from frontend.states import MainStream
-from frontend.keyboards.inline_keyboards import reg_markup as reg, start_markup
-from backend.sql_core import AsyncORM
+from src.frontend.states import MainStream
+from src.frontend.keyboards.inline_keyboards import reg_markup as reg, start_markup
+from src.backend.sql_core import AsyncORM
 
 router = Router()
 
@@ -23,6 +23,7 @@ async def first_start(msg: Message, state: FSMContext):
         return await home(state=state)
 
     await state.set_state(MainStream.Start)
+    print(get_path(name="start.webp"))
     photo = FSInputFile(get_path(name="start.webp"))
 
     bot_msg = await msg.bot.send_photo(
