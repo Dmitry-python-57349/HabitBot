@@ -27,6 +27,12 @@ async def add_user(user: UserData):
     return {"message": f"<User: {user_id}> created!"}
 
 
+@app.get("/get_habit_marks/")
+async def get_habits(habit_id: int):
+    habit_marks = await AsyncORM.get_habit_marks(habit_id=habit_id)
+    return {"data": habit_marks}
+
+
 @app.get("/get_habits/")
 async def get_habits(user_id: int):
     habits = await AsyncORM.get_habits(user_id=user_id)
@@ -49,6 +55,12 @@ async def edit_habit(data=Body()):
 async def delete_habit(data=Body()):
     await AsyncORM.delete_habit(habit_id=data["habit_id"])
     return {"message": "Habit has been deleted!"}
+
+
+@app.get("/increase_mark_counter/")
+async def get_habits(habit_id: int):
+    result = await AsyncORM.increase_mark_counter(habit_id=habit_id)
+    return {"data": result}
 
 
 @app.get("/db/")

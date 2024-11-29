@@ -2,6 +2,7 @@ from sqlalchemy import select, delete, update
 from src.backend.db_engine import Base, async_engine, async_session
 from src.backend.models import User, Habit
 from src.backend.pydantic_models import UserHabitData, UserData
+from src.settings import settings
 
 
 class AsyncORM:
@@ -19,6 +20,27 @@ class AsyncORM:
             return result.scalars().all()
 
     @staticmethod
+    async def increase_mark_counter(habit_id: int) -> bool:
+        async with async_session() as session:
+            stmt = select(Habit.mark_counter).where(Habit.id == habit_id)
+            res = await session.execute(stmt)
+            habit_count = res.scalars().first()
+            if habit_count >= settings.MAX_MARK_COUNT:
+                return False
+            habit_count += 1
+            stmt = (
+                update(Habit)
+                .where(Habit.id == habit_id)
+                .values(
+                    mark_counter=habit_count,
+                    today_mark=True,
+                )
+            )
+            await session.execute(stmt)
+            await session.commit()
+            return True
+
+    @staticmethod
     async def add_user(user: UserData) -> int:
         async with async_session() as session:
             user = User(
@@ -33,6 +55,14 @@ class AsyncORM:
             user_id = user.id
             await session.commit()
             return user_id
+
+    @staticmethod
+    async def get_habit_marks(habit_id: int) -> int:
+        async with async_session() as session:
+            stmt = select(Habit.today_mark).where(Habit.id == habit_id)
+            res = await session.execute(stmt)
+            await session.commit()
+            return res.scalars().first()
 
     @staticmethod
     async def get_habits(user_id: int) -> list[Habit]:

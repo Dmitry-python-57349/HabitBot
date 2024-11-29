@@ -9,7 +9,6 @@ from src.frontend.utils import (
 )
 from src.frontend.states import MainStream
 from src.frontend.keyboards.inline_keyboards import reg_markup as reg, start_markup
-from src.backend.sql_core import AsyncORM
 
 router = Router()
 
@@ -23,9 +22,7 @@ async def first_start(msg: Message, state: FSMContext):
         return await home(state=state)
 
     await state.set_state(MainStream.Start)
-    print(get_path(name="start.webp"))
     photo = FSInputFile(get_path(name="start.webp"))
-
     bot_msg = await msg.bot.send_photo(
         chat_id=msg.chat.id,
         photo=photo,
@@ -39,7 +36,6 @@ async def first_start(msg: Message, state: FSMContext):
         habit_name="",
         habit_desc="",
     )
-    await AsyncORM.create_tables()
     await reg_user(user=msg.from_user)
 
 

@@ -1,3 +1,4 @@
+import json
 import os.path
 from aiohttp import ClientSession
 from aiogram.fsm.context import FSMContext
@@ -63,19 +64,6 @@ async def delete_fixer(state: FSMContext) -> None:
             await state.update_data(curr_habit=list_num)
 
 
-async def edit_habit(state: FSMContext, **kwargs) -> None:
-    state_data = await state.get_data()
-    habits_data, curr_habit = state_data["habits_data"], state_data["curr_habit"]
-    json_data = {"habit_id": habits_data[curr_habit]["id"]}
-    json_data.update(**kwargs)
-    async with ClientSession() as session:
-        url = await get_url(url_path="edit_habit")
-        await session.put(
-            url=url,
-            json=json_data,
-        )
-
-
 async def get_url(url_path: str = "", params: dict | None = None) -> str:
     result = f"{settings.PROTO}://{settings.HOST}:{settings.PORT}/"
     if url_path:
@@ -99,3 +87,45 @@ async def reg_user(user: TgUser) -> None:
 
 def get_success_image_path(name: str) -> str:
     return ABS_PATH + f"\\frontend\\images\\{name}"
+
+
+async def delete_habit_by_id(habit_id: int) -> None:
+    async with ClientSession() as session:
+        url = await get_url(url_path="delete_habit")
+        json_data = {"habit_id": habit_id}
+        await session.delete(
+            url=url,
+            json=json_data,
+        )
+
+
+async def increase_mark_counter(habit_id: int) -> bool:
+    async with ClientSession() as session:
+        url = await get_url(
+            url_path="increase_mark_counter", params={"habit_id": habit_id}
+        )
+        response = await session.get(url)
+        content = await response.content.read()
+        data = json.loads(content)
+        return data["data"]
+
+
+async def edit_habit(state: FSMContext, **kwargs) -> None | int:
+    state_data = await state.get_data()
+    habits_data, curr_habit = state_data["habits_data"], state_data["curr_habit"]
+    habit_id = habits_data[curr_habit]["id"]
+    json_data = {"habit_id": habit_id}
+    json_data.update(**kwargs)
+    async with ClientSession() as session:
+        url = await get_url(url_path="get_habit_marks", params={"habit_id": habit_id})
+        response = await session.get(url)
+        content = await response.content.read()
+        data = json.loads(content)
+        res = data["data"]
+        if res >= settings.MAX_MARK_COUNT:
+            return res
+        url = await get_url(url_path="edit_habit")
+        await session.put(
+            url=url,
+            json=json_data,
+        )

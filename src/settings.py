@@ -13,14 +13,15 @@ class Settings:
     try:
         BOT_TOKEN = getenv("BOT_TOKEN")
         DB_HOST = getenv("DB_HOST")
-        DB_PORT = getenv("DB_PORT")
+        DB_PORT = int(getenv("DB_PORT"))
         DB_USER = getenv("DB_USER")
         DB_PASS = getenv("DB_PASS")
         DB_NAME = getenv("DB_NAME")
         HOST = getenv("HOST")
-        PORT = getenv("PORT")
+        PORT = int(getenv("PORT"))
         PROTO = getenv("PROTO")
-        MAX_MARK_COUNT = getenv("MAX_MARK_COUNT")
+        DEBUG = int(getenv("DEBUG"))
+        MAX_MARK_COUNT = int(getenv("MAX_MARK_COUNT"))
     except ValueError:
         exit("Ошибка получения целого числа!")
 

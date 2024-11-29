@@ -1,7 +1,7 @@
 from aiogram import Router, F
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
-from src.frontend.utils import edit_delete_bot_msg as editor, edit_habit
+from src.frontend.utils import edit_delete_bot_msg as editor
 from src.frontend.states import MainStream
 from src.frontend.keyboards.inline_keyboards import (
     habit_markup_builder,
@@ -100,23 +100,3 @@ async def blank(call: CallbackQuery, state: FSMContext):
     curr_habit, num_of_habits = state_data["curr_habit"], state_data["num_of_habits"]
     curr_habit += 1
     await call.answer(text=f"<{curr_habit} из {num_of_habits}>")
-
-
-@router.callback_query(F.data == "habit_mark", MainStream.Habit_read)
-async def habit_mark(
-    call: CallbackQuery | None = None, state: FSMContext | None = None
-):
-    state_data = await state.get_data()
-    curr_habit, habits_data = (
-        state_data["curr_habit"],
-        state_data["habits_data"],
-    )
-    status = habits_data[curr_habit]["today_mark"]
-    if status:
-        await call.answer(text="Вы уже отметили данную привычку!")
-        return
-    await edit_habit(state=state, today_mark=True)
-    habits_data[curr_habit]["today_mark"] = True
-    await state.update_data(habits_data=habits_data)
-    await call.answer(text="Привычка отмечена!")
-    await habit_viewer(state=state)

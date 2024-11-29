@@ -5,7 +5,13 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message
 from src.frontend.states import MainStream
 from src.frontend.handlers.habits_view import habit_viewer
-from src.frontend.utils import edit_delete_bot_msg as editor, delete_fixer, get_url
+from src.frontend.utils import (
+    edit_delete_bot_msg as editor,
+    delete_fixer,
+    get_url,
+    increase_mark_counter,
+    delete_habit_by_id,
+)
 from src.frontend.keyboards.inline_keyboards import create_habit_markup as chm
 
 router = Router()
@@ -61,18 +67,42 @@ async def habits_create(
 
 
 @router.callback_query(F.data == "habit_delete", MainStream.Habit_read)
-async def habits_delete(
+async def habit_delete(
     call: CallbackQuery | None = None, state: FSMContext | None = None
 ):
     state_data = await state.get_data()
     habits_data, curr_habit = state_data["habits_data"], state_data["curr_habit"]
-    async with ClientSession() as session:
-        url = await get_url(url_path="delete_habit")
-        json_data = {"habit_id": habits_data[curr_habit]["id"]}
-        await session.delete(
-            url=url,
-            json=json_data,
-        )
+    habit_id = habits_data[curr_habit]["id"]
+    await delete_habit_by_id(habit_id=habit_id)
     await call.answer(text="Привычка удалена!")
     await state.set_state(MainStream.Habit_delete)
     await habits_list(call=call, state=state)
+
+
+@router.callback_query(F.data == "habit_mark", MainStream.Habit_read)
+async def habit_mark(
+    call: CallbackQuery | None = None, state: FSMContext | None = None
+):
+    state_data = await state.get_data()
+    curr_habit, habits_data = (
+        state_data["curr_habit"],
+        state_data["habits_data"],
+    )
+    habit_id = habits_data[curr_habit]["id"]
+    status = habits_data[curr_habit]["today_mark"]
+
+    if status:
+        await call.answer(text="Вы уже отметили данную привычку!")
+        return
+
+    res = await increase_mark_counter(habit_id=habit_id)
+    if not res:
+        await delete_habit_by_id(habit_id=habit_id)
+        await call.answer(text="Вы смогли привить новую привычку! Поздравляем 🎉")
+        await habit_viewer(state=state)
+        return
+
+    habits_data[curr_habit]["today_mark"] = True
+    await state.update_data(habits_data=habits_data)
+    await call.answer(text="Привычка отмечена!")
+    await habit_viewer(state=state)
